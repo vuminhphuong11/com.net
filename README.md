@@ -1,2 +1,7 @@
-# m-ng-m-y-t-nh
-lập trình dứng dụng chat socket
+# Chat Socket Application
+ 
+## How to Run
+### 1. Start the server 
+Run ' python server.py ' in terminal
+### 2. Client
+Run ' python client.py ' in a new terminal
