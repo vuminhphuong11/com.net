@@ -5,11 +5,10 @@ import database
 import traceback
 from Crypto.Cipher import DES
 from Crypto.Util.Padding import pad, unpad
-
+import base64
 
 host = '0.0.0.0'
 port = 12345
-
 # khóa
 DES_KEY = b'8bytekey'
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -17,16 +16,15 @@ server_socket.bind((host, port))
 server_socket.listen(5)
 clients = []
 usernames = {}
-#  mã hóa với giải mã
 def des_encrypt(data):
     cipher = DES.new(DES_KEY, DES.MODE_ECB)
     padded_data = pad(data.encode('utf-8'), DES.block_size)
     encrypted = cipher.encrypt(padded_data)
-    return encrypted
-
+    return base64.b64encode(encrypted)  # encode thành chuỗi base64
 def des_decrypt(data):
     cipher = DES.new(DES_KEY, DES.MODE_ECB)
-    decrypted_padded = cipher.decrypt(data)
+    decoded = base64.b64decode(data)  # decode từ base64 về bytes
+    decrypted_padded = cipher.decrypt(decoded)
     decrypted = unpad(decrypted_padded, DES.block_size)
     return decrypted.decode('utf-8')
 
@@ -59,7 +57,6 @@ def handle_client(client_socket):
             client_socket.send(des_encrypt(protocol.create_message('error', content='Invalid command format')))
             client_socket.close()
             return
-
         if command['type'] == 'register':
             username = command['sender']
             password = command['content']
@@ -70,7 +67,6 @@ def handle_client(client_socket):
             client_socket.send(des_encrypt(resp))
             client_socket.close()
             return
-
         elif command['type'] == 'login':
             username = command['sender']
             password = command['content']
@@ -93,7 +89,6 @@ def handle_client(client_socket):
             client_socket.send(des_encrypt(protocol.create_message('error', content='Unknown command')))
             client_socket.close()
             return
-
         while True:
             msg_data = client_socket.recv(1024)
             if not msg_data:

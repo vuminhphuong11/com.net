@@ -3,7 +3,7 @@ import threading
 import protocol
 from Crypto.Cipher import DES
 from Crypto.Util.Padding import pad, unpad
-
+import base64
 # chìa khóa phải gồm 64 bit tức là 8 ký tự nhé với lại khóa ở đây phải giống với file server
 DES_KEY = b'8bytekey'
 # mã hóa và giải mã
@@ -11,11 +11,11 @@ def des_encrypt(data):
     cipher = DES.new(DES_KEY, DES.MODE_ECB)
     padded_data = pad(data.encode('utf-8'), DES.block_size)
     encrypted = cipher.encrypt(padded_data)
-    return encrypted
-
+    return base64.b64encode(encrypted)  # mã hóa Base64 sau khi DES
 def des_decrypt(data):
     cipher = DES.new(DES_KEY, DES.MODE_ECB)
-    decrypted_padded = cipher.decrypt(data)
+    decoded = base64.b64decode(data)  # giải mã Base64 trước
+    decrypted_padded = cipher.decrypt(decoded)
     decrypted = unpad(decrypted_padded, DES.block_size)
     return decrypted.decode('utf-8')
 
