@@ -1,0 +1,15 @@
+import sqlite3
+
+def show_users():
+    conn = sqlite3.connect("chat.db")
+    c = conn.cursor()
+    c.execute("SELECT username, password FROM users")
+    rows = c.fetchall()
+    conn.close()
+
+    print("📋 Danh sách tài khoản trong chat.db:")
+    for user, pw in rows:
+        print(f"👤 {user} / 🔒 {pw}")
+
+if __name__ == "__main__":
+    show_users()
